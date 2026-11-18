@@ -20,6 +20,19 @@ Prompt e ferramentas para fazer o agent do Cursor **reaproveitar componentes, te
 | Consulta | `tools/ai-index/mcp-server.mjs` | Servidor MCP sem dependências com 6 tools: `search_components`, `get_component`, `find_usages`, `list_routes`, `get_route` e `refresh_index`. A busca entende termos em português. |
 | Regra | `.cursor/rules/reuse-first-ui.mdc` | Obriga o fluxo: decompor a tela → buscar candidatos → plano REUSAR / COMPOR / ESTENDER / CRIAR → aprovação → implementar → atualizar o índice. |
 
+## Rascunhos de tela iteráveis (segundo prompt)
+
+Depois do setup acima, o [`prompt-cursor-rascunhos.md`](prompt-cursor-rascunhos.md) adiciona um fluxo parecido com os artefatos do Claude: você manda uma referência (print, link, "parecida com a tela X" ou só a ideia), o agent monta um rascunho com os componentes reais do design system e dados fictícios, você ajusta até ficar bom e só então ele vira código do produto.
+
+| Parte | Arquivo | O que faz |
+|---|---|---|
+| Página de rascunhos | `src/__rascunhos/RascunhosPage.tsx` + rota `/dev/rascunhos` | Só existe em desenvolvimento. Mostra cada rascunho numa moldura com abas de variantes e tamanhos de tela (celular, tablet, desktop) e abre a variante sozinha para anotar com o Design Mode do Cursor. |
+| Skill `tela` | `.cursor/skills/tela/SKILL.md` | `/tela` cria o rascunho (plano de reaproveitamento pelo `ui-index`, plano visual, variantes, conferência por screenshot); `/tela promover` leva a variante aprovada para a rota real, troca os dados fictícios pelos reais, apaga o rascunho e atualiza o índice. |
+| Estética | `.cursor/skills/tela/references/estetica-com-design-system.md` | Usa a skill de estética do projeto (ex.: `frontend-design`) para composição, hierarquia e texto, sempre dentro do design system: nada de cor, fonte ou espaçamento fora dele. |
+| Regra | `.cursor/rules/reuse-first-ui.mdc` | Rascunho segue sem parar para aprovação; a parada passa a ser na promoção. Produto nunca importa nada de `__rascunhos`. |
+
+Funciona com Next (App Router e Pages Router) e React Router (rotas em objetos ou em JSX), com TypeScript. O Design Mode fica no browser do Agents Window do Cursor. Os rascunhos ficam fora do índice, do Prettier, do ESLint e do Biome, e não entram no build de produção (no Next, a rota responde 404).
+
 ## Correções para quem já rodou o prompt
 
 Cada arquivo em `correcoes/` é um prompt pronto: abra no GitHub, use o botão "Copy raw file" e cole no chat do Cursor, no modo Agent.
@@ -38,11 +51,12 @@ Cada arquivo em `correcoes/` é um prompt pronto: abra no GitHub, use o botão "
 
 | Caminho | Conteúdo |
 |---|---|
-| `prompt-cursor-ai-index.md` | O prompt pronto. É gerado: não edite à mão. |
-| `prompt-template.md` | Texto do prompt com os marcadores `{{FILE:...}}`, `{{SHA:...}}` e `{{LINES:...}}`. |
+| `prompt-cursor-ai-index.md` | O primeiro prompt pronto (índice, MCP e regra). É gerado: não edite à mão. |
+| `prompt-cursor-rascunhos.md` | O segundo prompt pronto (rascunhos de tela e skill `tela`). É gerado: não edite à mão. |
+| `prompt-template.md` e `prompt-template-rascunhos.md` | Texto dos prompts com os marcadores `{{FILE:...}}`, `{{SHA:...}}`, `{{LINES:...}}` e `{{URL:...}}`. |
 | `src/` | Os arquivos que o prompt manda criar no seu repositório. |
 | `correcoes/` | Prompts curtos para corrigir repositórios que já rodaram uma versão anterior do prompt. |
-| `scripts/build-prompt.mjs` | Monta o prompt a partir do template e de `src/`: embute os arquivos, os hashes SHA-256 que o agent usa para conferir cada cópia e os links dos originais, fixos no último commit que mexeu em `src/`. |
+| `scripts/build-prompt.mjs` | Monta os prompts a partir dos templates e de `src/`: embute os arquivos, os hashes SHA-256 que o agent usa para conferir cada cópia e os links dos originais, fixos no último commit que mexeu em `src/`. |
 
 Para mudar alguma coisa:
 
@@ -60,3 +74,4 @@ node scripts/build-prompt.mjs
 - Monorepo com o design system num pacote de workspace.
 - Projeto só em JavaScript.
 - Repositório novo seguindo o prompt de ponta a ponta, com commits passando pelo hook do husky.
+- Rascunhos: página testada em TypeScript estrito; rota `/dev/rascunhos` com 404 em produção e 200 em desenvolvimento no Next 16 (App Router e Pages Router); fora do build de produção no Vite com React Router (objetos e JSX).

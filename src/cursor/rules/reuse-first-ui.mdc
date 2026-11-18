@@ -63,6 +63,8 @@ Depois da tabela, informe:
 
 Então PARE e peça aprovação. Não escreva código antes da aprovação. Única exceção: se o pedido disser explicitamente "pode implementar direto", entregue a tabela e siga.
 
+Exceção para rascunhos: se a tarefa for um rascunho da skill `tela` (arquivos só dentro da pasta `__rascunhos`), entregue a tabela e siga sem parar. A aprovação acontece quando o rascunho for promovido para a rota real, e na promoção esta regra vale inteira, com a parada.
+
 ### Etapa 5: implementar
 
 - Siga a tabela aprovada. Se precisar mudar a decisão de alguma peça, pare e avise antes.
@@ -75,6 +77,7 @@ Então PARE e peça aprovação. Não escreva código antes da aprovação. Úni
   - criar componente com nome ou responsabilidade que se sobreponha a um existente;
   - mudar o comportamento padrão de um componente existente;
   - editar `node_modules`;
+  - importar qualquer coisa da pasta `__rascunhos` em código do produto;
   - alterar componente do design system, a não ser que a decisão aprovada seja `ESTENDER` aquele componente e ele esteja dentro deste repositório.
 
 ### Etapa 6: atualizar e conferir o índice

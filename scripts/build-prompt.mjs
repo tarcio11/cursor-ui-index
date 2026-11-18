@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Monta prompt-cursor-ai-index.md a partir de prompt-template.md e dos arquivos de src/.
+ * Monta os prompts a partir dos templates (lista PROMPTS) e dos arquivos de src/.
  * Marcadores do template:
  *   {{FILE:nome}}   bloco com o conteúdo do arquivo (cercado por 4 crases)
  *   {{SHA:nome}}    SHA-256 do conteúdo (com quebras de linha LF), usado pelo agent para conferir a cópia
@@ -21,7 +21,18 @@ const FILES = {
   'mcp-smoke-test.mjs': ['src/tools/ai-index/mcp-smoke-test.mjs', 'js'],
   'pre-commit.sh': ['src/tools/ai-index/pre-commit.sh', 'sh'],
   'reuse-first-ui.mdc': ['src/cursor/rules/reuse-first-ui.mdc', 'markdown'],
+  'RascunhosPage.tsx': ['src/rascunhos/RascunhosPage.tsx', 'tsx'],
+  'registro.ts': ['src/rascunhos/registro.ts', 'ts'],
+  'tipos.ts': ['src/rascunhos/tipos.ts', 'ts'],
+  'tela-SKILL.md': ['src/cursor/skills/tela/SKILL.md', 'markdown'],
+  'estetica-com-design-system.md': ['src/cursor/skills/tela/references/estetica-com-design-system.md', 'markdown'],
 };
+
+// template -> prompt gerado
+const PROMPTS = [
+  ['prompt-template.md', 'prompt-cursor-ai-index.md'],
+  ['prompt-template-rascunhos.md', 'prompt-cursor-rascunhos.md'],
+];
 
 function content(name) {
   const entry = FILES[name];
@@ -46,18 +57,23 @@ function rawBaseUrl() {
   return `https://raw.githubusercontent.com/${match[1]}/${match[2]}/${commit}`;
 }
 
-let out = fs.readFileSync(path.join(ROOT, 'prompt-template.md'), 'utf8').replace(/\r\n/g, '\n');
-out = out.replace(/\{\{FILE:([^}]+)\}\}/g, (_, name) => '````' + FILES[name][1] + '\n' + content(name) + '````');
-out = out.replace(/\{\{SHA:([^}]+)\}\}/g, (_, name) => crypto.createHash('sha256').update(content(name)).digest('hex'));
-out = out.replace(/\{\{LINES:([^}]+)\}\}/g, (_, name) => String(content(name).split('\n').length - 1));
-if (out.includes('{{URL:')) {
-  const base = rawBaseUrl();
-  out = out.replace(/\{\{URL:([^}]+)\}\}/g, (_, name) => {
-    if (!FILES[name]) throw new Error(`Arquivo desconhecido no template: ${name}`);
+function build(template) {
+  const source = fs.readFileSync(path.join(ROOT, template), 'utf8').replace(/\r\n/g, '\n');
+  let base = null;
+  // Uma passada só sobre o template: o conteúdo embutido dos arquivos nunca é reprocessado
+  const out = source.replace(/\{\{(FILE|SHA|LINES|URL):([^}]+)\}\}/g, (_, kind, name) => {
+    if (!FILES[name]) throw new Error(`Arquivo desconhecido no template ${template}: ${name}`);
+    if (kind === 'FILE') return '````' + FILES[name][1] + '\n' + content(name) + '````';
+    if (kind === 'SHA') return crypto.createHash('sha256').update(content(name)).digest('hex');
+    if (kind === 'LINES') return String(content(name).split('\n').length - 1);
+    base ??= rawBaseUrl();
     return `${base}/${FILES[name][0]}`;
   });
+  return out;
 }
-if (out.includes('{{')) throw new Error('Sobrou marcador {{...}} no prompt gerado');
 
-fs.writeFileSync(path.join(ROOT, 'prompt-cursor-ai-index.md'), out);
-console.log(`prompt-cursor-ai-index.md gerado (${out.length} caracteres, ${out.split('\n').length - 1} linhas)`);
+for (const [template, output] of PROMPTS) {
+  const out = build(template);
+  fs.writeFileSync(path.join(ROOT, output), out);
+  console.log(`${output} gerado (${out.length} caracteres, ${out.split('\n').length - 1} linhas)`);
+}
