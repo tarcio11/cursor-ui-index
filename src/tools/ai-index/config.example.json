@@ -1,0 +1,10 @@
+{
+  "tsconfig": "tsconfig.json",
+  "include": ["src/**/*.{ts,tsx,js,jsx}"],
+  "exclude": ["**/*.test.*", "**/*.spec.*", "**/*.stories.*", "**/*.cy.*", "**/__tests__/**", "**/__mocks__/**"],
+  "excludeComponentPattern": "^.+Icon$",
+  "designSystem": {
+    "packages": [],
+    "folders": ["src/components/ui"]
+  }
+}

@@ -1,0 +1,88 @@
+---
+description: Fluxo obrigatório "reaproveitar antes de criar" para qualquer tarefa de UI (telas, rotas, layouts e componentes)
+alwaysApply: true
+---
+
+# Reaproveitar antes de criar (UI)
+
+Este repositório tem um índice GERADO de todo o front: componentes do design system, componentes locais, telas, layouts, as props de cada componente, onde cada um é usado e todas as rotas. O índice é a fonte de verdade sobre o que já existe. Consulte-o SEMPRE antes de escrever código de UI.
+
+## Quando esta regra vale
+
+Em qualquer tarefa que crie ou altere tela/página, rota, layout ou componente visual, inclusive quando o pedido vier como design (Figma, print, imagem) ou como descrição em texto. Não vale para tarefas sem UI (só backend, só testes, só configuração).
+
+## Como consultar o índice
+
+1. Use as tools do MCP `ui-index`:
+   - `search_components`: busca por termos; aceita `kind` (`component`, `page`, `layout`) e `source` (`design-system`, `local`).
+   - `get_component`: props com tipos, descrição, arquivo, onde é usado e o que ele usa por dentro.
+   - `find_usages`: todos os arquivos e rotas que usam o componente.
+   - `list_routes` e `get_route`: rotas, tela e layouts de cada uma e componentes usados.
+   - `refresh_index`: regera o índice.
+2. Se as tools do `ui-index` não estiverem disponíveis nesta sessão, faça buscas de texto no arquivo `<<P>>tools/ai-index/generated/component-index.md` (procure por termos; não leia o arquivo inteiro de uma vez) e escreva na resposta: "MCP ui-index indisponível, usei o fallback do arquivo".
+3. Se algo que existe no código não aparece no índice, rode `refresh_index` (ou `<<RUN>> <<P>>tools/ai-index/generate.mjs`) e consulte de novo.
+
+## Fluxo obrigatório: siga na ordem, sem pular etapas
+
+### Etapa 1: decompor a tela
+
+Liste todas as peças de UI do pedido, de fora para dentro: rota e layout; cabeçalho e título; navegação (menu, abas, breadcrumb); filtros e busca; tabelas e listas; cards; formulários e campos; botões e ações; modais, drawers e confirmações; badges, tags e status; estados de carregamento, vazio e erro; mensagens (toast, alerta).
+
+### Etapa 2: procurar candidatos para cada peça
+
+Para CADA peça da Etapa 1:
+
+1. Rode `search_components` pelo menos 2 vezes, com termos diferentes: o termo em português, o termo em inglês e sinônimos (ex.: "tabela table grid", "modal dialog drawer", "status badge tag chip").
+2. Para cada candidato plausível, rode `get_component` (props e variantes) e `find_usages` (onde já é usado).
+3. Abra pelo menos 1 arquivo onde o candidato escolhido já é usado e veja como ele é usado de verdade.
+4. Prioridade entre candidatos: 1º design system; 2º componente local já usado em outras telas; 3º componente local de uma única feature.
+
+### Etapa 3: rotas e telas parecidas
+
+1. Rode `list_routes`: veja se a rota pedida já existe e qual rota pai/layout a nova tela deve usar.
+2. Rode `search_components` com `kind: "page"` procurando uma tela parecida (outra listagem, outro detalhe, outro formulário). Se existir, rode `get_route` nela e use a mesma estrutura, o mesmo layout e os mesmos componentes.
+
+### Etapa 4: plano de reaproveitamento (ANTES de escrever qualquer código)
+
+Responda com esta tabela, uma linha por peça da Etapa 1:
+
+| Peça da tela | Candidato(s) (nome + id) | Onde já é usado | Diferença para o pedido | Decisão | Justificativa |
+|---|---|---|---|---|---|
+
+A coluna "Decisão" aceita somente um destes valores, nesta ordem de preferência:
+
+1. `REUSAR`: usar o componente existente como está.
+2. `COMPOR`: montar a peça juntando componentes existentes na própria tela, sem componente novo.
+3. `ESTENDER`: adicionar uma prop ou variante OPCIONAL a um componente existente. Obrigatório: rodar `find_usages`, informar quantos usos existem e garantir que o valor padrão mantém o comportamento atual de todos eles.
+4. `CRIAR`: componente novo. Só é permitido quando `REUSAR`, `COMPOR` e `ESTENDER` forem inviáveis. A justificativa precisa citar cada candidato avaliado (nome + id) e o motivo concreto de ele não servir.
+
+Depois da tabela, informe:
+
+- Rota: caminho, se é nova ou existente, rota pai/layout e o arquivo onde a rota será registrada.
+- Arquivos que serão criados e arquivos que serão alterados.
+
+Então PARE e peça aprovação. Não escreva código antes da aprovação. Única exceção: se o pedido disser explicitamente "pode implementar direto", entregue a tabela e siga.
+
+### Etapa 5: implementar
+
+- Siga a tabela aprovada. Se precisar mudar a decisão de alguma peça, pare e avise antes.
+- Em `CRIAR`:
+  - monte o componente com componentes do design system por dentro; não recrie com HTML/CSS próprio botão, input, select, tipografia, ícone, modal, tabela ou qualquer coisa que o design system já tenha;
+  - salve na mesma estrutura de pastas de componentes parecidos (use o `file` dos candidatos como referência); se só esta tela usa, ele fica na pasta da feature;
+  - escreva um comentário JSDoc de uma linha logo acima da declaração dizendo o que ele é (essa descrição alimenta a busca do índice).
+- Proibido:
+  - copiar e colar um componente existente para mudar um detalhe;
+  - criar componente com nome ou responsabilidade que se sobreponha a um existente;
+  - mudar o comportamento padrão de um componente existente;
+  - editar `node_modules`;
+  - alterar componente do design system, a não ser que a decisão aprovada seja `ESTENDER` aquele componente e ele esteja dentro deste repositório.
+
+### Etapa 6: atualizar e conferir o índice
+
+1. Rode `refresh_index` (ou `<<RUN>> <<P>>tools/ai-index/generate.mjs`).
+2. Confirme com `get_component` que cada componente criado ou estendido aparece com as props certas e, com `get_route`, que a rota aparece.
+3. Termine com a tabela da Etapa 4 atualizada com o que foi feito de fato.
+
+## Arquivos gerados
+
+`<<P>>tools/ai-index/generated/component-index.json` e `<<P>>tools/ai-index/generated/component-index.md` são gerados por `<<P>>tools/ai-index/generate.mjs`. Nunca edite esses arquivos à mão. Eles são atualizados automaticamente no commit (hook de pre-commit).
