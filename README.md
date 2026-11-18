@@ -20,6 +20,14 @@ Prompt e ferramentas para fazer o agent do Cursor **reaproveitar componentes, te
 | Consulta | `tools/ai-index/mcp-server.mjs` | Servidor MCP sem dependências com 6 tools: `search_components`, `get_component`, `find_usages`, `list_routes`, `get_route` e `refresh_index`. A busca entende termos em português. |
 | Regra | `.cursor/rules/reuse-first-ui.mdc` | Obriga o fluxo: decompor a tela → buscar candidatos → plano REUSAR / COMPOR / ESTENDER / CRIAR → aprovação → implementar → atualizar o índice. |
 
+## Correções para quem já rodou o prompt
+
+Cada arquivo em `correcoes/` é um prompt pronto: abra no GitHub, use o botão "Copy raw file" e cole no chat do Cursor, no modo Agent.
+
+| Correção | Quando usar |
+|---|---|
+| [`correcoes/01-formatador-e-hashes.md`](correcoes/01-formatador-e-hashes.md) | Você rodou a primeira versão do prompt (commit `ccbd1fe`) e o hash de `generate.mjs`, `mcp-server.mjs` ou `mcp-smoke-test.mjs` não bateu, porque um formatador (normalmente o Prettier ao salvar) mudou os arquivos. |
+
 ## Requisitos
 
 - Projeto React, com ou sem TypeScript.
@@ -33,6 +41,7 @@ Prompt e ferramentas para fazer o agent do Cursor **reaproveitar componentes, te
 | `prompt-cursor-ai-index.md` | O prompt pronto. É gerado: não edite à mão. |
 | `prompt-template.md` | Texto do prompt com os marcadores `{{FILE:...}}`, `{{SHA:...}}` e `{{LINES:...}}`. |
 | `src/` | Os arquivos que o prompt manda criar no seu repositório. |
+| `correcoes/` | Prompts curtos para corrigir repositórios que já rodaram uma versão anterior do prompt. |
 | `scripts/build-prompt.mjs` | Monta o prompt a partir do template e de `src/`: embute os arquivos, os hashes SHA-256 que o agent usa para conferir cada cópia e os links dos originais, fixos no último commit que mexeu em `src/`. |
 
 Para mudar alguma coisa:
