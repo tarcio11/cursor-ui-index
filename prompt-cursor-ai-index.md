@@ -113,7 +113,7 @@ Não altere nada nesta fase. Descubra os valores abaixo e mostre-os numa tabela 
 ````
 
 **1.4 Criar `tools/ai-index/generate.mjs`** dentro de APP_ROOT, **conteúdo exato** (regra 9).
-- Link do original: https://raw.githubusercontent.com/tarcio11/cursor-ui-index/ccbd1fe3fc8e8df85c179b0c12776b1118f5d629/src/tools/ai-index/generate.mjs
+- Link do original: https://raw.githubusercontent.com/tarcio11/cursor-ui-index/cef261bcaca0e2033c1bf72c2f38ce593cc59264/src/tools/ai-index/generate.mjs
 - Hash esperado: `40bce9b827bca5a504b9a7567d3f5b31670f92bfac1085a442971a6e280dbcbd`
 - Bloco (só se o download falhar):
 
@@ -1023,7 +1023,7 @@ if (MODE === 'discover') {
 2. Se TYPECHECK não for `nenhum`: dentro de APP_ROOT, rode `<PM_RUN> <TYPECHECK>`. Se houver erros em arquivos de `tools/ai-index/`, adicione `"tools/ai-index"` ao `exclude` do arquivo TSCONFIG (crie a chave `exclude` se não existir) e rode de novo. Erros em outros arquivos já existiam antes: não mexa, só registre no relatório.
 
 **1.10 Criar `tools/ai-index/pre-commit.sh`** dentro de APP_ROOT, **conteúdo exato** (regra 9).
-- Link do original: https://raw.githubusercontent.com/tarcio11/cursor-ui-index/ccbd1fe3fc8e8df85c179b0c12776b1118f5d629/src/tools/ai-index/pre-commit.sh
+- Link do original: https://raw.githubusercontent.com/tarcio11/cursor-ui-index/cef261bcaca0e2033c1bf72c2f38ce593cc59264/src/tools/ai-index/pre-commit.sh
 - Hash esperado: `b0e5b165c3b48c47028c07775671835e8ac5c86080b845019e2676094703ac73`
 - Bloco (só se o download falhar):
 
@@ -1082,7 +1082,7 @@ exit 0
 ## Fase 2: passo 2, servidor MCP `ui-index`
 
 **2.1 Criar `tools/ai-index/mcp-server.mjs`** dentro de APP_ROOT, **conteúdo exato** (regra 9).
-- Link do original: https://raw.githubusercontent.com/tarcio11/cursor-ui-index/ccbd1fe3fc8e8df85c179b0c12776b1118f5d629/src/tools/ai-index/mcp-server.mjs
+- Link do original: https://raw.githubusercontent.com/tarcio11/cursor-ui-index/cef261bcaca0e2033c1bf72c2f38ce593cc59264/src/tools/ai-index/mcp-server.mjs
 - Hash esperado: `bdf19c76f89b59e4edd77768d575e3b53df4d47ffe297b4d5b67de5a146a92e1`
 - Bloco (só se o download falhar):
 
@@ -1491,7 +1491,7 @@ console.error('[ui-index] MCP server pronto. Índice:', INDEX_FILE);
 ````
 
 **2.2 Criar `tools/ai-index/mcp-smoke-test.mjs`** dentro de APP_ROOT, **conteúdo exato** (regra 9).
-- Link do original: https://raw.githubusercontent.com/tarcio11/cursor-ui-index/ccbd1fe3fc8e8df85c179b0c12776b1118f5d629/src/tools/ai-index/mcp-smoke-test.mjs
+- Link do original: https://raw.githubusercontent.com/tarcio11/cursor-ui-index/cef261bcaca0e2033c1bf72c2f38ce593cc59264/src/tools/ai-index/mcp-smoke-test.mjs
 - Hash esperado: `bdf9ad28509dda7b610666d722a45528684c9798af4b1440d11bfa1984ca9827`
 - Bloco (só se o download falhar):
 
@@ -1602,7 +1602,7 @@ process.exit(failed ? 1 : 0);
 
 ## Fase 3: passo 3, regra do agent
 
-**3.1 Criar `.cursor/rules/reuse-first-ui.mdc`** em CURSOR_ROOT (crie as pastas se não existirem), **conteúdo exato**, trocando `<<P>>` e `<<RUN>>` pelos valores da Fase 0 (essa troca é a única diferença permitida; o arquivo final tem 88 linhas). Se já existir um arquivo com esse nome, PARE e me pergunte.
+**3.1 Criar `.cursor/rules/reuse-first-ui.mdc`** em CURSOR_ROOT (crie as pastas se não existirem), **conteúdo exato**, trocando `<<P>>` e `<<RUN>>` pelos valores da Fase 0 (essa troca é a única diferença permitida; o arquivo final tem 91 linhas). Se já existir um arquivo com esse nome, PARE e me pergunte.
 
 ````markdown
 ---
@@ -1670,6 +1670,8 @@ Depois da tabela, informe:
 
 Então PARE e peça aprovação. Não escreva código antes da aprovação. Única exceção: se o pedido disser explicitamente "pode implementar direto", entregue a tabela e siga.
 
+Exceção para rascunhos: se a tarefa for um rascunho da skill `tela` (arquivos só dentro da pasta `__rascunhos`), entregue a tabela e siga sem parar. A aprovação acontece quando o rascunho for promovido para a rota real, e na promoção esta regra vale inteira, com a parada.
+
 ### Etapa 5: implementar
 
 - Siga a tabela aprovada. Se precisar mudar a decisão de alguma peça, pare e avise antes.
@@ -1682,6 +1684,7 @@ Então PARE e peça aprovação. Não escreva código antes da aprovação. Úni
   - criar componente com nome ou responsabilidade que se sobreponha a um existente;
   - mudar o comportamento padrão de um componente existente;
   - editar `node_modules`;
+  - importar qualquer coisa da pasta `__rascunhos` em código do produto;
   - alterar componente do design system, a não ser que a decisão aprovada seja `ESTENDER` aquele componente e ele esteja dentro deste repositório.
 
 ### Etapa 6: atualizar e conferir o índice
