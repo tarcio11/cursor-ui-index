@@ -8,6 +8,7 @@ Prompt e ferramentas para fazer o agent do Cursor **reaproveitar componentes, te
 2. Copie todo o conteúdo de [`prompt-cursor-ai-index.md`](prompt-cursor-ai-index.md) e cole no chat.
    Se o Cursor cortar o texto colado, salve o arquivo na raiz do seu repositório e peça: `Execute exatamente as instruções de @prompt-cursor-ai-index.md`.
 3. O agent descobre como o seu projeto está montado, configura tudo e termina com um relatório. Ele para e pergunta quando encontra um caso que o prompt não cobre.
+   Os arquivos de código são baixados deste repositório (links fixos num commit) e conferidos por hash SHA-256. Se não houver acesso ao GitHub, o agent copia dos blocos do próprio prompt. Antes de criar os arquivos, ele tira a pasta `tools/ai-index` do Prettier, do ESLint e do Biome, para nenhum formatador alterar os arquivos ao salvar.
 4. Depois: habilite o servidor `ui-index` em Settings → MCP do Cursor e faça o commit.
 
 ## O que o prompt configura no seu repositório
@@ -32,9 +33,13 @@ Prompt e ferramentas para fazer o agent do Cursor **reaproveitar componentes, te
 | `prompt-cursor-ai-index.md` | O prompt pronto. É gerado: não edite à mão. |
 | `prompt-template.md` | Texto do prompt com os marcadores `{{FILE:...}}`, `{{SHA:...}}` e `{{LINES:...}}`. |
 | `src/` | Os arquivos que o prompt manda criar no seu repositório. |
-| `scripts/build-prompt.mjs` | Monta o prompt a partir do template e de `src/`, incluindo os hashes SHA-256 que o agent usa para conferir se copiou cada arquivo sem alteração. |
+| `scripts/build-prompt.mjs` | Monta o prompt a partir do template e de `src/`: embute os arquivos, os hashes SHA-256 que o agent usa para conferir cada cópia e os links dos originais, fixos no último commit que mexeu em `src/`. |
 
-Para mudar alguma coisa, edite `src/` ou `prompt-template.md` e rode:
+Para mudar alguma coisa:
+
+1. Edite `src/` ou `prompt-template.md`.
+2. Se mexeu em `src/`, commite e dê push antes de gerar o prompt: os links do prompt apontam para esse commit (o script recusa gerar com mudanças não commitadas em `src/`).
+3. Gere o prompt e depois commite e dê push dele:
 
 ```sh
 node scripts/build-prompt.mjs

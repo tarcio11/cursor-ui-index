@@ -5,11 +5,13 @@
  *   {{FILE:nome}}   bloco com o conteúdo do arquivo (cercado por 4 crases)
  *   {{SHA:nome}}    SHA-256 do conteúdo (com quebras de linha LF), usado pelo agent para conferir a cópia
  *   {{LINES:nome}}  número de linhas do arquivo
- * Uso: node scripts/build-prompt.mjs
+ *   {{URL:nome}}    link "raw" do GitHub para o arquivo, fixo no último commit que mexeu em src/
+ * Uso: commite e dê push em src/ antes; depois rode node scripts/build-prompt.mjs
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -30,10 +32,31 @@ function content(name) {
   return text;
 }
 
+const git = (...args) => execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' }).trim();
+
+// Os links apontam para um commit fixo: o conteúdo baixado nunca muda e sempre bate com o hash do prompt
+function rawBaseUrl() {
+  if (git('status', '--porcelain', '--', 'src')) {
+    throw new Error('Há mudanças não commitadas em src/. Commite src/ (e dê push) antes de gerar o prompt.');
+  }
+  const commit = git('log', '-1', '--format=%H', '--', 'src');
+  const remote = git('remote', 'get-url', 'origin');
+  const match = remote.match(/github\.com[:/]([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
+  if (!match) throw new Error(`O remote origin não é um repositório do GitHub: ${remote}`);
+  return `https://raw.githubusercontent.com/${match[1]}/${match[2]}/${commit}`;
+}
+
 let out = fs.readFileSync(path.join(ROOT, 'prompt-template.md'), 'utf8').replace(/\r\n/g, '\n');
 out = out.replace(/\{\{FILE:([^}]+)\}\}/g, (_, name) => '````' + FILES[name][1] + '\n' + content(name) + '````');
 out = out.replace(/\{\{SHA:([^}]+)\}\}/g, (_, name) => crypto.createHash('sha256').update(content(name)).digest('hex'));
 out = out.replace(/\{\{LINES:([^}]+)\}\}/g, (_, name) => String(content(name).split('\n').length - 1));
+if (out.includes('{{URL:')) {
+  const base = rawBaseUrl();
+  out = out.replace(/\{\{URL:([^}]+)\}\}/g, (_, name) => {
+    if (!FILES[name]) throw new Error(`Arquivo desconhecido no template: ${name}`);
+    return `${base}/${FILES[name][0]}`;
+  });
+}
 if (out.includes('{{')) throw new Error('Sobrou marcador {{...}} no prompt gerado');
 
 fs.writeFileSync(path.join(ROOT, 'prompt-cursor-ai-index.md'), out);
