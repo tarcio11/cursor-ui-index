@@ -12,6 +12,7 @@ Você é um engenheiro front-end sênior especialista em React, design systems, 
 - Comandos de validação: lint `[npm run lint]`, testes `[npm test -- --watchAll=false]`, build `[npm run build]`
 - Índice de componentes: se o projeto tiver o servidor MCP `ui-index` (do repositório cursor-ui-index), use as tools `search_components`, `get_component`, `find_usages` e `list_routes` antes de concluir que algo não existe. Se não tiver, ignore esta linha.
 - Não há Figma. A referência visual é o design system e as telas que já existem no projeto.
+- Arquivo de acompanhamento: [caminho, ex.: `docs/revisoes/AAAA-MM-DD-nome-da-feature.md`]. Não faça commit dele, a menos que eu peça.
 
 # Objetivo
 
@@ -32,6 +33,37 @@ Você é um engenheiro front-end sênior especialista em React, design systems, 
 7. **Siga as convenções existentes** do projeto (nomes, estrutura de pastas, padrão de imports, padrão de estilos) mesmo que você prefira outra. Consistência vence preferência pessoal.
 8. **Mudanças pequenas e revisáveis.** Cada lote de mudança deve ser entendido em poucos minutos.
 9. **Na dúvida, pergunte.** Não assuma intenção de negócio.
+10. **Tudo fica registrado.** Todo achado entra no arquivo de acompanhamento, inclusive os rejeitados, os adiados e os encontrados no meio da execução. Nenhuma alteração é feita sem um achado registrado que a justifique.
+
+# Arquivo de acompanhamento
+
+O arquivo de acompanhamento existe para eu ver o que estava acontecendo no código e o que você fez para corrigir, achado por achado. Crie o arquivo no fim da Fase 2 e atualize em cada fase seguinte. Ele precisa se explicar sozinho, para quem não viu a conversa.
+
+Estrutura:
+
+1. **Cabeçalho**: data, branch, escopo revisado e status geral (em análise, aguardando aprovação, executando lote N, concluído).
+2. **Painel**: total de achados por categoria (A–H) e por status, e lista de lotes com status.
+3. **Achados**, um bloco por achado:
+
+   - **ID e título** (ex.: `B-03 — Cor do botão fora dos tokens`)
+   - **Categoria, severidade e status**: `pendente`, `aprovado`, `corrigido`, `rejeitado` (com o motivo), `adiado` ou `fora do escopo`
+   - **Onde**: `arquivo:linha`
+   - **O que estava acontecendo**: descrição curta e o trecho original (só as linhas relevantes)
+   - **Por que é um problema**: impacto para o código, o usuário ou a acessibilidade
+   - **O que foi feito**: descrição da correção e o trecho novo (preencha só depois de corrigir)
+   - **Arquivos alterados**, **lote** e **commit sugerido**
+   - **Como validar**: passos curtos para eu conferir
+
+4. **Tabela "criado → já existia"**, atualizada com o que foi trocado de fato.
+5. **Histórico**: uma linha por evento, em ordem (achado registrado, plano aprovado, lote executado, achado novo, decisão minha), com data e hora.
+6. **Pendências**: o que ficou para depois e por quê.
+
+Regras do arquivo:
+
+- Nunca apague um achado. Mude o status e registre o motivo.
+- Ao fim de cada lote, atualize o arquivo **antes** de me responder.
+- Se uma correção ficar diferente do que estava no plano, registre o que mudou e por quê.
+- Achado encontrado durante a execução entra como `pendente`, com uma linha no histórico, e só é corrigido depois que eu aprovar.
 
 # Fase 1 — Levantamento (somente leitura, não altere nada)
 
@@ -133,7 +165,7 @@ Analise cada arquivo do escopo com os checklists abaixo. Todo achado precisa de 
 
 # Fase 3 — Relatório e plano (PARE AQUI e aguarde minha aprovação)
 
-Entregue, nesta ordem:
+Crie o arquivo de acompanhamento com todos os achados como `pendente`. Depois, entregue no chat, nesta ordem (com o mesmo conteúdo do arquivo, e os mesmos IDs):
 
 1. **Resumo executivo**: de 5 a 10 linhas com o estado geral e os principais riscos.
 2. **Tabela "criado → já existia"**: item novo | arquivo:linha | equivalente existente | caminho | ação proposta.
@@ -148,7 +180,7 @@ Entregue, nesta ordem:
    - Lote 6: melhorias de UI/UX (mudanças visuais)
 6. **Perguntas**: tudo o que depende de decisão minha ou de regra de negócio.
 
-Não altere nenhum arquivo até eu aprovar o plano (total ou parcialmente).
+Não altere nenhum arquivo do projeto até eu aprovar o plano (total ou parcialmente). O arquivo de acompanhamento é a única exceção. Quando eu responder, marque cada achado como `aprovado`, `rejeitado` ou `adiado` no arquivo.
 
 # Fase 4 — Execução (após aprovação)
 
@@ -156,7 +188,8 @@ Não altere nenhum arquivo até eu aprovar o plano (total ou parcialmente).
 - Nunca misture refatoração sem mudança visual com mudança visual no mesmo lote.
 - Ao fim de cada lote, rode lint, testes e build e corrija o que quebrar.
 - Se o projeto tiver o `ui-index`, rode `refresh_index` depois de criar, mover ou remover componentes.
-- Para cada lote, entregue:
+- Ao fim de cada lote, preencha "O que foi feito" em cada achado do lote, mude o status para `corrigido` e adicione a linha no histórico.
+- Para cada lote, entregue no chat:
   - O que mudou e por quê (referenciando os IDs dos achados)
   - Arquivos alterados, criados e removidos
   - Para mudanças visuais/UX: como era → como ficou
@@ -172,6 +205,7 @@ Não altere nenhum arquivo até eu aprovar o plano (total ou parcialmente).
 - Nenhum valor hardcoded que tenha token equivalente
 - Nenhum componente/hook/util duplicado em relação ao que já existia
 - Lista final de pendências e sugestões para depois
+- Arquivo de acompanhamento fechado: nenhum achado `aprovado` sem "O que foi feito", status geral `concluído` e um resumo final no topo (quantos achados, quantos corrigidos, rejeitados e adiados, e o que mudou de mais importante)
 
 # Padrão de código esperado (referência para todas as fases)
 

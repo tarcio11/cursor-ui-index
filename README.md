@@ -40,6 +40,7 @@ Quando as telas estiverem prontas, o [`prompt-revisao-telas.md`](prompt-revisao-
 1. Preencha os campos entre colchetes na seção "Contexto do projeto" (stack, design system, telas, comandos).
 2. Cole no chat. O agent levanta e analisa tudo, entrega um relatório com `arquivo:linha` e um plano em lotes, e **para antes de alterar qualquer arquivo**.
 3. Aprove o plano (inteiro ou em parte). Ele executa um lote por vez, rodando lint, testes e build ao fim de cada um.
+4. Acompanhe pelo arquivo de acompanhamento (o caminho você define no contexto). Cada achado mostra o que estava acontecendo, por que é um problema e o que foi feito para corrigir, com o trecho antes e depois e o status (`pendente`, `aprovado`, `corrigido`, `rejeitado`, `adiado`). O arquivo também traz um histórico do que aconteceu em cada etapa.
 
 Ao contrário dos dois primeiros, este prompt não é gerado: edite o arquivo diretamente.
 
