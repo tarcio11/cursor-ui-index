@@ -33,6 +33,16 @@ Depois do setup acima, o [`prompt-cursor-rascunhos.md`](prompt-cursor-rascunhos.
 
 Funciona com Next (App Router e Pages Router) e React Router (rotas em objetos ou em JSX), com TypeScript. O Design Mode fica no browser do Agents Window do Cursor. Os rascunhos ficam fora do índice, do Prettier, do ESLint e do Biome, e não entram no build de produção (no Next, a rota responde 404).
 
+## Revisão das telas prontas (terceiro prompt)
+
+Quando as telas estiverem prontas, o [`prompt-revisao-telas.md`](prompt-revisao-telas.md) faz a revisão profunda: encontra o que foi criado e já existia no projeto, padroniza pelo design system, componentiza, remove code smells e revisa layout, UI/UX e acessibilidade (WCAG 2.2 AA). Funciona em qualquer modelo e não depende do índice, mas usa o `ui-index` se ele estiver configurado.
+
+1. Preencha os campos entre colchetes na seção "Contexto do projeto" (stack, design system, telas, comandos).
+2. Cole no chat. O agent levanta e analisa tudo, entrega um relatório com `arquivo:linha` e um plano em lotes, e **para antes de alterar qualquer arquivo**.
+3. Aprove o plano (inteiro ou em parte). Ele executa um lote por vez, rodando lint, testes e build ao fim de cada um.
+
+Ao contrário dos dois primeiros, este prompt não é gerado: edite o arquivo diretamente.
+
 ## Correções para quem já rodou o prompt
 
 Cada arquivo em `correcoes/` é um prompt pronto: abra no GitHub, use o botão "Copy raw file" e cole no chat do Cursor, no modo Agent.
@@ -53,6 +63,7 @@ Cada arquivo em `correcoes/` é um prompt pronto: abra no GitHub, use o botão "
 |---|---|
 | `prompt-cursor-ai-index.md` | O primeiro prompt pronto (índice, MCP e regra). É gerado: não edite à mão. |
 | `prompt-cursor-rascunhos.md` | O segundo prompt pronto (rascunhos de tela e skill `tela`). É gerado: não edite à mão. |
+| `prompt-revisao-telas.md` | O terceiro prompt (revisão de telas prontas). Não é gerado: edite à mão. |
 | `prompt-template.md` e `prompt-template-rascunhos.md` | Texto dos prompts com os marcadores `{{FILE:...}}`, `{{SHA:...}}`, `{{LINES:...}}` e `{{URL:...}}`. |
 | `src/` | Os arquivos que o prompt manda criar no seu repositório. |
 | `correcoes/` | Prompts curtos para corrigir repositórios que já rodaram uma versão anterior do prompt. |
